@@ -1,2 +1,0 @@
-C:\Projects\pre\novacom_win7\Novacom_Win7_x86\bin\Release\Novacomd_Win7_x86.wixpdb
-obj\Release\Novacom86.wixobj
