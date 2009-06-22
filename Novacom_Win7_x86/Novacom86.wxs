@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Product Id="25a38cd2-dff3-4eb9-8838-d63a184568aa" Name="Novacomd" Language="1033" Version="1.0.0.0" Manufacturer="Palm, Inc" UpgradeCode="99805016-8916-479c-80f9-e5ae9cae4991">
+    <Package InstallerVersion="200" Compressed="yes" />
+
+    <Condition Message="You need to be an administrator to install this product.">Privileged</Condition>
+    <Condition Message="This product can only be installed on Windows 7 x86.">VersionNT = 601 AND NOT VersionNT64</Condition>
+
+    <Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
+
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="ProgramFilesFolder">
+        <Directory Id="PalmIncFolder" Name="Palm, Inc">
+          <Directory Id="INSTALLLOCATION" Name="novacom">
+            <Directory Id="PlatformFolder" Name="x86">
+              <Component Id="BinaryComponent" Guid="40f89e80-cb16-4dba-bb66-01937c9a0066">
+                <File Id='NovacomdEXE' Name='novacomd.exe' DiskId='1' Source='PFiles\x86\novacomd.exe' />
+                <File Id='WdfCoInstaller01007DLL' Name='WdfCoInstaller01007.dll' DiskId='1' Source='PFiles\x86\WdfCoInstaller01007.dll' />
+                <File Id='WinUSBCoInstallerDLL' Name='WinUSBCoInstaller.dll' DiskId='1' Source='PFiles\x86\WinUSBCoInstaller.dll' />
+                <File Id='WUDFUpdate_01007DLL' Name='WUDFUpdate_01007.dll' DiskId='1' Source='PFiles\x86\WUDFUpdate_01007.dll' />
+              </Component>
+            </Directory>
+            <Component Id="DriverComponent" Guid="3B7F0E74-EBAE-43cb-AF54-4BE4BFC7A5B0">
+              <File Id='DpinstEXE' Name='dpinst.exe' DiskId='1' Source='PFiles\dpinst.exe' />
+              <File Id='DpinstXML' Name='DPInst.xml' DiskId='1' Source='PFiles\DPInst.xml' />
+              <File Id='NovacomCAT' Name='novacom.cat' DiskId='1' Source='PFiles\novacom.cat' />
+              <File Id='NovacomINF' Name='novacom.inf' DiskId='1' Source='PFiles\novacom.inf' />
+            </Component>
+          </Directory>
+        </Directory>
+      </Directory>
+      <Component Id="RegistryComponent" Guid="574F74B6-E992-4162-9D26-029AC449D816">
+        <RegistryKey Id="NovacomDKey" Root="HKLM" Key="SYSTEM\CurrentControlSet\services\NovacomD" Action="createAndRemoveOnUninstall">
+          <RegistryValue Id='NovacomDType' Name='Type' Action='write' Type='integer' Value='16' />
+          <RegistryValue Id='NovacomDStart' Name='Start' Action='write' Type='integer' Value='2' />
+          <RegistryValue Id='NovacomDErrorControl' Name='ErrorControl' Action='write' Type='integer' Value='1' />
+          <RegistryValue Id='NovacomDImagePath' Name='ImagePath' Action='write' Type='expandable' Value='[TARGETDIR]\Program Files\Palm, Inc\novacom\x86\novacomd.exe' />
+          <RegistryValue Id='NovacomDDisplayName' Name='DisplayName' Action='write' Type='string' Value='Palm Novacom' />
+          <RegistryValue Id='NovacomDObjectName' Name='ObjectName' Action='write' Type='string' Value='LocalSystem' />
+          <RegistryValue Id='NovacomDDescription' Name='Description' Action='write' Type='string' Value='Palm Novacom driver' />
+          <RegistryKey Id="NovacomDEnumKey" Key="Enum" Action="createAndRemoveOnUninstall">
+            <RegistryValue Id='NovacomDEnum0' Name='0' Action='write' Type='string' Value='Root\LEGACY_NOVACOMD\0000' />
+            <RegistryValue Id='NovacomDEnumCount' Name='Count' Action='write' Type='integer' Value='1' />
+            <RegistryValue Id='NovacomDEnumNextInstance' Name='NextInstance' Action='write' Type='integer' Value='1' />
+          </RegistryKey>
+        </RegistryKey>
+      </Component>
+    </Directory>
+
+    <CustomAction Id='RunDpinst' FileKey='DpinstEXE' ExeCommand='/q' Return='asyncNoWait' />
+
+    <Feature Id="ProductFeature" Title="Novacom" Level="1">
+      <ComponentRef Id="BinaryComponent" />
+      <ComponentRef Id="DriverComponent" />
+      <ComponentRef Id="RegistryComponent" />
+    </Feature>
+
+    <InstallExecuteSequence>
+      <Custom Action='RunDpinst' After='InstallFinalize' />
+      <ScheduleReboot After='InstallFinalize' />
+    </InstallExecuteSequence>
+
+  </Product>
+</Wix>
